@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel In Your Hand - Implementation Deck</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- PptxGenJS Library for Export -->
+    <script src="https://cdn.jsdelivr.net/gh/gitbrent/PptxGenJS@3.12.0/dist/pptxgen.bundle.js"></script>
+    <style>
+        /* 1. THE SETUP */
+        * { box-sizing: border-box; }
+        p { margin: 0; margin-bottom: 15px; }
+        body { background-color: #0f172a; display: grid; gap: 40px; grid-template-columns: 1fr; margin: 0; padding: 40px 0; place-items: center; }
+
+        .slide-container {
+            align-items: center;
+            background-color: #020617;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            height: 720px;
+            justify-content: center;
+            overflow: hidden;
+            padding: 50px 70px;
+            position: relative;
+            width: 1280px;
+            color: #f8fafc;
+        }
+
+        /* Abstract Background Decor */
+        .slide-container::before {
+            content: '';
+            position: absolute;
+            top: -10%;
+            right: -10%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, transparent 70%);
+            z-index: 0;
+        }
+
+        .slide-container > * { position: relative; z-index: 1; }
+
+        /* 2. TYPOGRAPHY */
+        h1, h2, h3 { color: #f8fafc; font-family: 'Space Grotesk', sans-serif; margin: 0; }
+        h1 { font-size: 64px; line-height: 1.1; margin-bottom: 20px; text-transform: uppercase; letter-spacing: -2px; }
+        .slide-title { font-size: 40px; margin-bottom: 35px; text-align: left; width: 100%; border-left: 6px solid #10b981; padding-left: 20px; color: #f8fafc; }
+        h3 { font-size: 24px; color: #10b981; margin-bottom: 12px; font-weight: 600; }
+        p, li { font-size: 18px; line-height: 1.5; color: #94a3b8; }
+
+        .subtitle { font-size: 22px; color: #10b981; margin: 15px 0; font-weight: 500; }
+
+        /* 3. LAYOUTS */
+        .title-layout { text-align: center; max-width: 1000px; }
+        .content-area { display: flex; flex-direction: column; flex-grow: 1; width: 100%; justify-content: flex-start; }
+
+        .two-column { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; width: 100%; align-items: start; }
+        
+        /* Tiled Layouts */
+        .tiled-content { display: flex; gap: 20px; width: 100%; }
+        .tile { flex: 1; background: rgba(30, 41, 59, 0.4); border: 1px solid rgba(51, 65, 85, 0.5); border-radius: 16px; padding: 25px; transition: transform 0.3s ease; position: relative; }
+        .tile:hover { transform: translateY(-5px); background: rgba(30, 41, 59, 0.6); }
+        .tile .icon { font-size: 32px; color: #10b981; margin-bottom: 15px; }
+
+        /* Gantt Chart Styling */
+        .gantt-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .gantt-table th, .gantt-table td { border: 1px solid #334155; padding: 12px; text-align: left; font-size: 15px; }
+        .gantt-table th { background: #1e293b; color: #10b981; text-transform: uppercase; letter-spacing: 1px; }
+        .bar-container { background: #0f172a; height: 14px; border-radius: 7px; width: 100%; position: relative; overflow: hidden; }
+        .bar { height: 100%; background: linear-gradient(90deg, #10b981, #34d399); }
+
+        /* Budget Styles */
+        .budget-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; width: 100%; }
+        .budget-item { text-align: center; padding: 25px; border-radius: 16px; background: rgba(16, 185, 129, 0.05); border: 1px dashed rgba(16, 185, 129, 0.3); }
+        .budget-val { font-size: 36px; font-weight: 700; color: #10b981; margin-bottom: 5px; font-family: 'Space Grotesk'; }
+        .budget-label { font-size: 14px; color: #94a3b8; text-transform: uppercase; }
+
+        /* Tables */
+        .table-layout table { width: 100%; border-collapse: collapse; }
+        .table-layout th { text-align: left; padding: 12px; border-bottom: 2px solid #10b981; color: #10b981; font-size: 18px; }
+        .table-layout td { padding: 12px; border-bottom: 1px solid #334155; color: #f8fafc; font-size: 16px; }
+
+        .image-wrapper { border-radius: 16px; overflow: hidden; height: 350px; width: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .image-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+
+        .footer-logo { position: absolute; bottom: 30px; right: 50px; opacity: 0.4; font-size: 16px; color: #10b981; font-family: 'Space Grotesk'; }
+
+        /* Gemini AI & Export Features Styling */
+        .ai-badge { background: linear-gradient(90deg, #3b82f6, #10b981); color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; position: absolute; top: -10px; right: 10px; border: 2px solid #020617; }
+        .ai-button { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: all 0.2s; margin-top: 15px; }
+        .ai-button:hover { transform: scale(1.05); box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); }
+        .ai-button:disabled { background: #4b5563; cursor: not-allowed; transform: none; box-shadow: none; }
+        
+        #ai-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; place-items: center; padding: 40px; }
+        .modal-content { background: #1e293b; width: 100%; max-width: 800px; border-radius: 20px; border: 1px solid #334155; padding: 30px; position: relative; }
+        #ai-response { background: #0f172a; padding: 20px; border-radius: 12px; color: #cbd5e1; font-size: 14px; max-height: 400px; overflow-y: auto; white-space: pre-wrap; margin-top: 20px; }
+        .close-modal { position: absolute; top: 20px; right: 20px; color: #94a3b8; cursor: pointer; font-size: 24px; }
+        
+        .loading-spinner { border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid #10b981; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .export-btn { background: #f59e0b; margin-top: 20px; align-self: center; }
+        .export-btn:hover { background: #d97706; }
+    </style>
+</head>
+<body>
+
+<!-- SLIDE 1: COVER -->
+<div class="slide-container">
+    <div class="title-layout">
+        <p class="subtitle">EKOSISTEM TRAVEL COMPANION BERBASIS AI</p>
+        <h1>Vision 2028: Execution Framework</h1>
+        <p>Roadmap implementasi produk, struktur tim, dan alokasi anggaran strategis untuk operasionalisasi Travel In Your Hand.</p>
+        <p style="margin-top: 10px; font-weight: bold; color: #f8fafc;">Disusun untuk: Milzon (Architect)</p>
+        
+        <button class="ai-button export-btn" onclick="exportToPPTX()">
+            <i class="fa-solid fa-file-powerpoint"></i> Export ke PPTX (PowerPoint)
+        </button>
+    </div>
+    <div class="footer-logo">TRAVEL IN YOUR HAND</div>
+</div>
+
+<!-- SLIDE 2: STAKEHOLDER MATRIX -->
+<div class="slide-container">
+    <h2 class="slide-title">Matriks Pemangku Kepentingan</h2>
+    <div class="content-area">
+        <div class="table-layout">
+            <table>
+                <thead>
+                    <tr>
+                        <th width="25%">Stakeholder</th>
+                        <th width="35%">Tugas Utama (Task)</th>
+                        <th width="40%">KPI Kunci</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Innovation Fund</strong></td>
+                        <td>Penyaluran modal bertahap & review performa bulanan.</td>
+                        <td>Burn rate vs Milestone, ROI target $4M/Year 3.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Milzon (Architect)</strong></td>
+                        <td>Visi sistem, desain AI, dan kepemimpinan teknis.</td>
+                        <td>Akurasi AI Recommendation > 85%.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Advisory Board</strong></td>
+                        <td>Akses jaringan pariwisata regional & kepatuhan regulasi.</td>
+                        <td>Perolehan lisensi di SG & MY tepat waktu.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Partner Operators</strong></td>
+                        <td>Integrasi API inventaris & sinkronisasi harga real-time.</td>
+                        <td>API Uptime 99.9% & variasi produk pariwisata.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- SLIDE 3: DETAILED TASK ALLOCATION -->
+<div class="slide-container">
+    <h2 class="slide-title">Alokasi Tugas Per Squad</h2>
+    <div class="content-area">
+        <div class="tiled-content">
+            <div class="tile">
+                <span class="ai-badge">PRODUK INTI</span>
+                <div class="icon"><i class="fa-solid fa-brain"></i></div>
+                <h3>AI & Data Squad</h3>
+                <ul style="padding-left: 20px;">
+                    <li>Behavioral clustering model</li>
+                    <li>Itinerary optimization engine</li>
+                    <li>Price prediction algorithm</li>
+                </ul>
+                <button class="ai-button" onclick="openDemo('itinerary')">
+                    <i class="fa-solid fa-sparkles"></i> ✨ Demo Penjana Jadual AI
+                </button>
+            </div>
+            <div class="tile">
+                <div class="icon"><i class="fa-solid fa-code"></i></div>
+                <h3>Platform Squad</h3>
+                <ul style="padding-left: 20px;">
+                    <li>API Orchestration Layer</li>
+                    <li>Secure Travel Wallet core</li>
+                    <li>Operator Analytics Dashboard</li>
+                </ul>
+            </div>
+            <div class="tile">
+                <div class="icon"><i class="fa-solid fa-rocket"></i></div>
+                <h3>Growth Squad</h3>
+                <ul style="padding-left: 20px;">
+                    <li>User acquisition (Target 50K)</li>
+                    <li>Community-led marketing</li>
+                    <li>D30 Retention programs</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SLIDE 4: DETAILED GANTT CHART -->
+<div class="slide-container">
+    <h2 class="slide-title">Roadmap Implementasi (Gantt Chart)</h2>
+    <div class="content-area">
+        <div class="table-layout">
+            <table class="gantt-table">
+                <thead>
+                    <tr>
+                        <th width="30%">Aktivitas Utama</th>
+                        <th>Q1: Research</th>
+                        <th>Q2: Build</th>
+                        <th>Q3: Test</th>
+                        <th>Q4: Launch</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Market Research & AI Prototype</td>
+                        <td><div class="bar-container"><div class="bar" style="width: 100%;"></div></div></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Development: AI Itinerary Core</td>
+                        <td></td>
+                        <td><div class="bar-container"><div class="bar" style="width: 100%;"></div></div></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Operator API Integration</td>
+                        <td></td>
+                        <td><div class="bar-container"><div class="bar" style="width: 60%; margin-left: 40%;"></div></div></td>
+                        <td><div class="bar-container"><div class="bar" style="width: 50%;"></div></div></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Beta Testing (1,000 Users)</td>
+                        <td></td>
+                        <td></td>
+                        <td><div class="bar-container"><div class="bar" style="width: 100%;"></div></div></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Official Launch Indonesia</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td><div class="bar-container"><div class="bar" style="width: 100%;"></div></div></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- SLIDE 5: BUDGET OVERVIEW (YEAR 1) -->
+<div class="slide-container">
+    <h2 class="slide-title">Budget Overview: Tahun ke-1</h2>
+    <div class="content-area">
+        <div class="two-column" style="margin-bottom: 40px;">
+            <div>
+                <h3>Total Requirement: $400,000</h3>
+                <p>Anggaran ini dirancang untuk mencapai validasi MVP dan akuisisi 50.000 pengguna pertama di pasar Indonesia.</p>
+                <div class="tile">
+                    <p><i class="fa-solid fa-fire-burner" style="color: #ef4444;"></i> <strong>Burn Rate:</strong> ~$33,300 per bulan</p>
+                    <p><i class="fa-solid fa-hourglass-start" style="color: #10b981;"></i> <strong>Runway:</strong> 12 Bulan (Phase 1)</p>
+                    <button class="ai-button" style="background: #334155;" onclick="openDemo('budget')">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> ✨ Analisis Bajet Pintar
+                    </button>
+                </div>
+            </div>
+            <div class="image-wrapper">
+                <img src="https://images.unsplash.com/photo-1551288049-bbda33a5f972?auto=format&fit=crop&w=600&q=80" alt="Grafik pertumbuhan finansial tech startup">
+            </div>
+        </div>
+        <div class="budget-grid">
+            <div class="budget-item">
+                <div class="budget-val">45%</div>
+                <div class="budget-label">Product & AI R&D</div>
+            </div>
+            <div class="budget-item">
+                <div class="budget-val">30%</div>
+                <div class="budget-label">Growth & Marketing</div>
+            </div>
+            <div class="budget-item">
+                <div class="budget-val">15%</div>
+                <div class="budget-label">Team & Ops</div>
+            </div>
+            <div class="budget-item">
+                <div class="budget-val">10%</div>
+                <div class="budget-label">Legal & Compliance</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SLIDE 6: BUDGET ALLOCATION DETAILS -->
+<div class="slide-container">
+    <h2 class="slide-title">Rincian Alokasi Anggaran</h2>
+    <div class="content-area">
+        <div class="table-layout">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Kategori</th>
+                        <th>Alokasi ($)</th>
+                        <th>Penggunaan Utama</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Product & AI R&D</strong></td>
+                        <td>$180,000</td>
+                        <td>Cloud compute (AWS/GCP), Gaji ML Engineers, API Subscriptions.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Growth & Marketing</strong></td>
+                        <td>$120,000</td>
+                        <td>Digital ads, Influencer travel, Referral rewards program.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Operations & Team</strong></td>
+                        <td>$60,000</td>
+                        <td>Sewa workspace, Biaya admin, Gaji tim operasional inti.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Legal & Compliance</strong></td>
+                        <td>$40,000</td>
+                        <td>Lisensi pariwisata, Audit keamanan data, Legal counsel.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <p style="margin-top: 30px; font-style: italic; color: #10b981; text-align: center;">
+            *Target Break-even pada bulan ke-20 dengan proyeksi revenue Year 3 mencapai $4M.
+        </p>
+    </div>
+</div>
+
+<!-- SLIDE 7: CLOSING -->
+<div class="slide-container">
+    <div class="title-layout">
+        <p class="subtitle" style="font-size: 32px;">Siap Mengeksekusi?</p>
+        <h1 style="font-size: 90px;">MULAI SEKARANG!</h1>
+        <p style="font-size: 20px;">Visi 2028: Menjadi AI Travel Companion Terbesar di Asia Tenggara.</p>
+        <div style="margin-top: 40px;">
+            <p>Milzon | AI Travel Platform Architect</p>
+        </div>
+    </div>
+    <div class="footer-logo">TRAVEL IN YOUR HAND</div>
+</div>
+
+<!-- GEMINI AI MODAL -->
+<div id="ai-modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <h3 id="modal-title" style="margin-bottom: 10px;">✨ Modul AI Aktif</h3>
+        <p id="modal-desc" style="font-size: 14px; margin-bottom: 20px; color: #94a3b8;"></p>
+        
+        <div id="itinerary-inputs" style="display: none;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                <div>
+                    <label style="display:block; font-size:12px; margin-bottom:5px;">Destinasi</label>
+                    <input type="text" id="target-dest" placeholder="Contoh: Bali, Singapura..." style="width:100%; background:#0f172a; border:1px solid #334155; color:white; padding:10px; border-radius:5px;">
+                </div>
+                <div>
+                    <label style="display:block; font-size:12px; margin-bottom:5px;">Bajet (USD)</label>
+                    <input type="number" id="target-budget" value="500" style="width:100%; background:#0f172a; border:1px solid #334155; color:white; padding:10px; border-radius:5px;">
+                </div>
+            </div>
+            <button class="ai-button" id="generate-btn" onclick="callGemini('itinerary')">Jana Jadual ✨</button>
+        </div>
+
+        <div id="budget-inputs" style="display: none;">
+            <p style="color:#cbd5e1; font-size:14px; margin-bottom:15px;">AI akan menganalisis keberkesanan peruntukan $400k anda berdasarkan trend pasaran 2026.</p>
+            <button class="ai-button" id="analyze-btn" onclick="callGemini('budget')">Mula Analisis ✨</button>
+        </div>
+
+        <div id="ai-response">Sila klik butang di atas untuk memulakan...</div>
+    </div>
+</div>
+
+<script>
+    const apiKey = ""; // Diset secara automatik dalam persekitaran
+
+    function openDemo(type) {
+        document.getElementById('ai-modal').style.display = 'grid';
+        document.getElementById('ai-response').innerText = 'Sila klik butang di atas untuk memulakan...';
+        
+        if(type === 'itinerary') {
+            document.getElementById('modal-title').innerText = '✨ Demo Penjana Jadual AI';
+            document.getElementById('modal-desc').innerText = 'Tunjukkan kepada pelabur bagaimana algoritma anda berfungsi menghasilkan jadual unik dalam sesaat.';
+            document.getElementById('itinerary-inputs').style.display = 'block';
+            document.getElementById('budget-inputs').style.display = 'none';
+        } else {
+            document.getElementById('modal-title').innerText = '✨ Analisis Bajet Pintar';
+            document.getElementById('modal-desc').innerText = 'Analisis risiko dan peluang berdasarkan data peruntukan kewangan sedia ada.';
+            document.getElementById('itinerary-inputs').style.display = 'none';
+            document.getElementById('budget-inputs').style.display = 'block';
+        }
+    }
+
+    function closeModal() {
+        document.getElementById('ai-modal').style.display = 'none';
+    }
+
+    async function callGemini(type) {
+        const responseArea = document.getElementById('ai-response');
+        const btn = type === 'itinerary' ? document.getElementById('generate-btn') : document.getElementById('analyze-btn');
+        
+        btn.disabled = true;
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<div class="loading-spinner"></div> Memproses...';
+        responseArea.innerText = "Sila tunggu, Gemini sedang menjana data...";
+
+        let userQuery = "";
+        let systemPrompt = "Anda adalah pembantu AI untuk platform Travel In Your Hand. Respon dalam Bahasa Melayu yang profesional.";
+
+        if(type === 'itinerary') {
+            const dest = document.getElementById('target-dest').value || "Destinasi Rawak";
+            const budget = document.getElementById('target-budget').value;
+            userQuery = `Jana satu jadual perjalanan ringkas 3 hari untuk ${dest} dengan bajet $${budget} USD. Fokus kepada aktiviti unik dan penginapan yang efisien. Gunakan format point form.`;
+        } else {
+            userQuery = `Analisis bajet startup pelancongan bernilai $400,000 dengan agihan: 45% AI R&D, 30% Marketing, 15% Ops, 10% Legal. Berikan 3 cadangan untuk mengurangkan risiko 'burn rate'.`;
+        }
+
+        try {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: userQuery }] }],
+                    systemInstruction: { parts: [{ text: systemPrompt }] }
+                })
+            });
+
+            if (!response.ok) throw new Error('API request failed');
+
+            const result = await response.json();
+            const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+            responseArea.innerText = text || "Maaf, tiada respon diterima.";
+        } catch (error) {
+            responseArea.innerText = "Ralat: Gagal menghubungi AI. Sila pastikan sambungan internet anda stabil.";
+            console.error(error);
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
+    }
+
+    // PPTX Export Logic
+    function exportToPPTX() {
+        let pptx = new PptxGenJS();
+        pptx.layout = 'LAYOUT_WIDE';
+        pptx.defineSlideMaster({
+            title: 'MASTER_SLIDE',
+            background: { color: '020617' },
+            objects: [
+                { text: { text: 'TRAVEL IN YOUR HAND', options: { x: 10.5, y: 7.0, color: '10b981', fontSize: 12, fontFace: 'Arial' } } }
+            ]
+        });
+
+        // Slide 1: Cover
+        let s1 = pptx.addSlide({ masterName: 'MASTER_SLIDE' });
+        s1.addText('VISION 2028: EXECUTION FRAMEWORK', { x: 1, y: 2.5, w: 11, fontSize: 48, bold: true, color: 'FFFFFF', align: 'center', fontFace: 'Arial' });
+        s1.addText('EKOSISTEM TRAVEL COMPANION BERBASIS AI', { x: 1, y: 2.0, w: 11, fontSize: 18, color: '10b981', align: 'center', fontFace: 'Arial' });
+        s1.addText('Disusun untuk: Milzon (Architect)', { x: 1, y: 4.5, w: 11, fontSize: 14, color: '94a3b8', align: 'center' });
+
+        // Slide 2: Stakeholders
+        let s2 = pptx.addSlide({ masterName: 'MASTER_SLIDE' });
+        s2.addText('Matriks Pemangku Kepentingan', { x: 0.5, y: 0.5, w: 12, fontSize: 32, bold: true, color: '10b981' });
+        let rows = [
+            ['Stakeholder', 'Tugas Utama', 'KPI Kunci'],
+            ['Innovation Fund', 'Penyaluran modal bertahap & review performa', 'Burn rate vs Milestone, ROI target $4M'],
+            ['Milzon (Architect)', 'Visi sistem, desain AI, kepemimpinan teknis', 'Akurasi AI Recommendation > 85%'],
+            ['Advisory Board', 'Akses jaringan pariwisata & kepatuhan regulasi', 'Lisensi SG & MY tepat waktu'],
+            ['Partner Operators', 'Integrasi API & sinkronisasi harga', 'API Uptime 99.9%']
+        ];
+        s2.addTable(rows, { x: 0.5, y: 1.5, w: 12, border: { pt: '1', color: '334155' }, fill: '1e293b', color: 'FFFFFF', fontSize: 14 });
+
+        // Slide 3: Task Allocation
+        let s3 = pptx.addSlide({ masterName: 'MASTER_SLIDE' });
+        s3.addText('Alokasi Tugas Per Squad', { x: 0.5, y: 0.5, w: 12, fontSize: 32, bold: true, color: '10b981' });
+        s3.addText('AI & Data Squad: Behavioral clustering, Itinerary optimization, Price prediction', { x: 1, y: 2.0, w: 11, fontSize: 18, color: 'FFFFFF' });
+        s3.addText('Platform Squad: API Orchestration, Secure Travel Wallet, Operator Analytics', { x: 1, y: 3.5, w: 11, fontSize: 18, color: 'FFFFFF' });
+        s3.addText('Growth Squad: User acquisition (50K), Community marketing, Retention programs', { x: 1, y: 5.0, w: 11, fontSize: 18, color: 'FFFFFF' });
+
+        // Slide 4: Gantt Chart
+        let s4 = pptx.addSlide({ masterName: 'MASTER_SLIDE' });
+        s4.addText('Roadmap Implementasi', { x: 0.5, y: 0.5, w: 12, fontSize: 32, bold: true, color: '10b981' });
+        let ganttRows = [
+            ['Aktivitas', 'Q1', 'Q2', 'Q3', 'Q4'],
+            ['Research & Prototype', 'DONE', '', '', ''],
+            ['AI Itinerary Core', '', 'BUILD', '', ''],
+            ['API Integration', '', 'SYNC', 'SYNC', ''],
+            ['Beta Testing', '', '', 'TEST', ''],
+            ['Launch ID', '', '', '', 'LIVE']
+        ];
+        s4.addTable(ganttRows, { x: 0.5, y: 1.5, w: 12, border: { pt: '1', color: '334155' }, fill: '1e293b', color: 'FFFFFF', fontSize: 14 });
+
+        // Slide 5: Budget
+        let s5 = pptx.addSlide({ masterName: 'MASTER_SLIDE' });
+        s5.addText('Budget Overview: $400,000', { x: 0.5, y: 0.5, w: 12, fontSize: 32, bold: true, color: '10b981' });
+        s5.addText('Alokasi Utama:', { x: 1, y: 1.5, fontSize: 24, color: 'FFFFFF' });
+        s5.addText('45% Product & AI R&D', { x: 1, y: 2.2, color: '10b981', fontSize: 20 });
+        s5.addText('30% Growth & Marketing', { x: 1, y: 2.8, color: '3b82f6', fontSize: 20 });
+        s5.addText('15% Team & Ops', { x: 1, y: 3.4, color: 'FFFFFF', fontSize: 20 });
+        s5.addText('10% Legal & Compliance', { x: 1, y: 4.0, color: '94a3b8', fontSize: 20 });
+        s5.addText('Burn Rate: ~$33,300/bulan | Runway: 12 Bulan', { x: 1, y: 5.5, fontSize: 18, italic: true, color: 'FFFFFF' });
+
+        // Slide 6: Closing
+        let s6 = pptx.addSlide({ masterName: 'MASTER_SLIDE' });
+        s6.addText('SIAP MENGEKSEKUSI?', { x: 1, y: 2.5, w: 11, fontSize: 60, bold: true, color: 'FFFFFF', align: 'center' });
+        s6.addText('MILZON | AI Travel Platform Architect', { x: 1, y: 4.0, w: 11, fontSize: 20, color: '10b981', align: 'center' });
+
+        pptx.writeFile({ fileName: 'Travel_In_Your_Hand_Roadmap_Milzon.pptx' });
+    }
+</script>
+
+</body>
+</html>
